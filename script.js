@@ -51,11 +51,27 @@ function addMessage(sender, text) {
   const div = document.createElement("div");
   div.className = `message ${sender}`;
 
+  // أيقونة من Font Awesome
+  const icon = document.createElement("div");
+  icon.className = "icon";
+  icon.innerHTML = sender === "user"
+    ? '<i class="fa-solid fa-user"></i>'
+    : '<i class="fa-solid fa-robot"></i>';
+
+  // الفقاعة
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   bubble.textContent = text;
 
-  div.appendChild(bubble);
+  // ترتيب RTL: المستخدم على اليمين، AI على الشمال
+  if (sender === "user") {
+    div.appendChild(icon);
+    div.appendChild(bubble);
+  } else {
+    div.appendChild(bubble);
+    div.appendChild(icon);
+  }
+
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
