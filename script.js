@@ -18,7 +18,6 @@ async function sendMessage() {
   const loaderElement = addLoader();
 
   try {
-    console.log("📤 بعت الطلب للـ Backend...");
     const res = await fetch("/api/backend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,10 +27,7 @@ async function sendMessage() {
       })
     });
 
-    // Debug
     const text = await res.text();
-    console.log("📥 الرد من الـ Backend:", text);
-
     removeLoader(loaderElement);
 
     let data;
@@ -42,7 +38,7 @@ async function sendMessage() {
     }
 
     const reply = data.choices?.[0]?.message?.content || "حصل خطأ!";
-    addMessage("ai", reply);
+    addTypingMessage("ai", reply);
 
   } catch (err) {
     removeLoader(loaderElement);
@@ -64,6 +60,29 @@ function addMessage(sender, text) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+/* Typing Effect */
+function addTypingMessage(sender, fullText) {
+  const div = document.createElement("div");
+  div.className = `message ${sender}`;
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  div.appendChild(bubble);
+  chatBox.appendChild(div);
+
+  let index = 0;
+  function typeChar() {
+    if (index < fullText.length) {
+      bubble.textContent += fullText.charAt(index);
+      index++;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      setTimeout(typeChar, 30);
+    }
+  }
+  typeChar();
+}
+
+/* Loader */
 function addLoader() {
   const div = document.createElement("div");
   div.className = "message ai loader-container";
@@ -86,3 +105,10 @@ function addLoader() {
 function removeLoader(loaderElement) {
   chatBox.removeChild(loaderElement);
 }
+
+/* Clear Chat */
+const clearBtn = document.getElementById("clear-chat");
+clearBtn.addEventListener("click", () => {
+  chatBox.innerHTML = "";
+  localStorage.removeItem("chat-history");
+});
